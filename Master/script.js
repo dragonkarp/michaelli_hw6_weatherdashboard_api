@@ -1,128 +1,114 @@
-$(document).ready(function() {
-  $("#search-button").on("click", function() {
-    var searchValue = $("#search-value").val();
+// OpenWeather API key: f64d6d31f15458727f791647df068f9b
+// OpenWeather API URL for current day weather: api.openweathermap.org/data/2.5/weather?q={city name}&appid={your api key}
+// OpenWeather API ULR for UV index: http://api.openweathermap.org/data/2.5/uvi?appid={appid}&lat={lat}&lon={lon}
+// OpenWeather API ULR for 5 day forecast: api.openweathermap.org/data/2.5/forecast?id={city ID}&appid={your api key}
 
-    // clear input box
-    $("#search-value").val("");
 
-    searchWeather(searchValue);
-  });
+//TEST AREA//////////////////////////////
+//getCurrentWeatherData("Chicago")
+getCurrentWeatherData("Chicago")
+//getUVIndex(41.85, -87.65)
+getUV_Index(41.85, -87.65) 
+//TEST AREA//////////////////////////////
 
-  $(".history").on("click", "li", function() {
-    searchWeather($(this).text());
-  });
 
-  function makeRow(text) {
-    var li = $("<li>").addClass("list-group-item list-group-item-action").text(text);
-    $(".history").append(li);
-  }
 
-  function searchWeather(searchValue) {
+
+// // Listens to the search button.
+// // Clears the input box when a search is performed.
+// $(document).ready(function() {
+//     $("#search-button").on("click", function(){
+//         var place = $("#search-value").val()
+//         $("#search-button").val() = ""
+//     });
+// });
+
+
+// // Take a string of the searched place and makes a button for it below the text bar. 
+// function makePreviouslySearchedButton(previouslySearchedPlace) {
+//     var searchedPlace = $("<li>").addClass("previously-searched previously-searched-event").text(previouslySearchedPlace)
+//     $(".history").append(searchedPlace)
+// }
+
+// // Listens to buttons of historical searches.
+// // Calls getWeatherData to retrieve information.
+// $(".history").on("click", "li", function() {
+//     return
+// });
+
+
+// AJAX call to OpenWeather API for the current date's weather information.
+// Using dynamically generated Bootstrap cards
+function getCurrentWeatherData(city) {
     $.ajax({
       type: "GET",
-      url: "http://api.openweathermap.org/data/2.5/weather?q=" + searchValue + "&appid=7ba67ac190f85fdba2e2dc6b9d32e93c&units=imperial",
+      url: "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=f64d6d31f15458727f791647df068f9b&units=imperial",
       dataType: "json",
-      success: function(data) {
-        // create history link for this search
-        if (history.indexOf(searchValue) === -1) {
-          history.push(searchValue);
-          window.localStorage.setItem("history", JSON.stringify(history));
-    
-          makeRow(searchValue);
-        }
-        
-        // clear any old content
+      success: function(response) {
         $("#today").empty();
 
-        // create html content for current weather
-        var title = $("<h3>").addClass("card-title").text(data.name + " (" + new Date().toLocaleDateString() + ")");
-        var card = $("<div>").addClass("card");
-        var wind = $("<p>").addClass("card-text").text("Wind Speed: " + data.wind.speed + " MPH");
-        var humid = $("<p>").addClass("card-text").text("Humidity: " + data.main.humidity + "%");
-        var temp = $("<p>").addClass("card-text").text("Temperature: " + data.main.temp + " °F");
-        var cardBody = $("<div>").addClass("card-body");
-        var img = $("<img>").attr("src", "http://openweathermap.org/img/w/" + data.weather[0].icon + ".png");
+        var currentWeatherMainCard = $("<div>").addClass("card") 
+        var currentWeatherBodyDiv = $("<div>").addClass("card-body")
+        var currentWeatherIcon = $("<div>").append(response.weather.icon)
 
-        // merge and add to page
-        title.append(img);
-        cardBody.append(title, temp, humid, wind);
-        card.append(cardBody);
-        $("#today").append(card);
+        var currentWeatherTemp = $("<p>").addClass("card-text").text("Temperature: " + response.main.temp + "F")
+        var currentWeatherHumidity = $("<p>").addClass("card-text").text("Humidity: " + response.main.humidity + "%")
+        var currentWeatherWindSpeed = $("<p>").addClass("card-text").text("Wind Speed:  " + response.wind.speed + " MPH")
 
-        // call follow-up api endpoints
-        getForecast(searchValue);
-        getUVIndex(data.coord.lat, data.coord.lon);
+        //currentWeatherTopInfo.append(currentWeatherCityName + currentDate + currentWeatherIcon) -_-' bad code
+        var currentWeatherTopInfo = $("<h4>").addClass("card-title").text(response.name + " " + moment().format("   (dddd, MMMM Do YYYY)") + currentWeatherIcon)
+
+        currentWeatherBodyDiv.append(currentWeatherTopInfo)
+        currentWeatherBodyDiv.append(currentWeatherTemp, currentWeatherHumidity, currentWeatherWindSpeed)
+        currentWeatherMainCard.append(currentWeatherBodyDiv)
+        $("#today").append(currentWeatherMainCard)
+
       }
     });
   }
-  
-  function getForecast(searchValue) {
+var xyz = moment().format("   (dddd, MMMM Do YYYY)")
+console.log(xyz)
+
+
+function getUV_Index(latitude, longitude) {
     $.ajax({
-      type: "GET",
-      url: "http://api.openweathermap.org/data/2.5/forecast?q=" + searchValue + "&appid=7ba67ac190f85fdba2e2dc6b9d32e93c&units=imperial",
-      dataType: "json",
-      success: function(data) {
-        // overwrite any existing content with title and empty row
-        $("#forecast").html("<h4 class=\"mt-3\">5-Day Forecast:</h4>").append("<div class=\"row\">");
+        type: "GET",
+        url: "http://api.openweathermap.org/data/2.5/uvi?appid=f64d6d31f15458727f791647df068f9b&lat=" + latitude + "&lon=" + longitude, 
+        dataType: "json",
+        success: function(response){
+            var uvIndex = $("<span>").text(response.value)
 
-        // loop over all forecasts (by 3-hour increments)
-        for (var i = 0; i < data.list.length; i++) {
-          // only look at forecasts around 3:00pm
-          if (data.list[i].dt_txt.indexOf("15:00:00") !== -1) {
-            // create html elements for a bootstrap card
-            var col = $("<div>").addClass("col-md-2");
-            var card = $("<div>").addClass("card bg-primary text-white");
-            var body = $("<div>").addClass("card-body p-2");
+            if (response.value < 3) {
+                uvIndex.addClass("badge badge-success")
+            } else if (response.value < 7) {
+                uvIndex.addClass("badge badge-warning")
+            } else if  (response.value > 6){
+                uvIndex.addClass("badge badge-danger")
+            }
 
-            var title = $("<h5>").addClass("card-title").text(new Date(data.list[i].dt_txt).toLocaleDateString());
-
-            var img = $("<img>").attr("src", "http://openweathermap.org/img/w/" + data.list[i].weather[0].icon + ".png");
-
-            var p1 = $("<p>").addClass("card-text").text("Temp: " + data.list[i].main.temp_max + " °F");
-            var p2 = $("<p>").addClass("card-text").text("Humidity: " + data.list[i].main.humidity + "%");
-
-            // merge together and put on page
-            col.append(card.append(body.append(title, img, p1, p2)));
-            $("#forecast .row").append(col);
-          }
+            $("#today .card-body").append(uvIndex) // I guessed this. Don't know why it works. 
         }
-      }
     });
-  }
+}
 
-  function getUVIndex(lat, lon) {
+function getFiveDayForecast(cityID) {
     $.ajax({
-      type: "GET",
-      url: "http://api.openweathermap.org/data/2.5/uvi?appid=7ba67ac190f85fdba2e2dc6b9d32e93c&lat=" + lat + "&lon=" + lon,
-      dataType: "json",
-      success: function(data) {
-        var uv = $("<p>").text("UV Index: ");
-        var btn = $("<span>").addClass("btn btn-sm").text(data.value);
-        
-        // change color depending on uv value
-        if (data.value < 3) {
-          btn.addClass("btn-success");
+        url: "http://api.openweathermap.org/data/2.5/forecast?id=" + cityID + "&appid=" + "f64d6d31f15458727f791647df068f9b",
+        type: "GET",
+        datatype: "json",
+        success: function(response) {
+            return;
         }
-        else if (data.value < 7) {
-          btn.addClass("btn-warning");
-        }
-        else {
-          btn.addClass("btn-danger");
-        }
-        
-        $("#today .card-body").append(uv.append(btn));
-      }
-    });
-  }
+    })
+}
+//http://api.openweathermap.org/data/2.5/forecast?id=4887398&appid=f64d6d31f15458727f791647df068f9b
+getFiveDayForecast(4887398)
 
-  // get current history, if any
-  var history = JSON.parse(window.localStorage.getItem("history")) || [];
 
-  if (history.length > 0) {
-    searchWeather(history[history.length-1]);
-  }
 
-  for (var i = 0; i < history.length; i++) {
-    makeRow(history[i]);
-  }
-});
+//////////////QUESTIONS FOR PHIL///////////////////
+//1) I wanted to practice using cards and noticed that in the documentation on BootStrap, the 
+//cards are not responsive, but they are. So I'm a little confused about that. It's in the 
+//layout section of the card component section. 
+//2) In getCurrentWeatherData(city) I am trying to put the icon in a div. it will nto display. 
+//////////////QUESTIONS FOR PHIL///////////////////

@@ -7,12 +7,8 @@
 //TEST AREA//////////////////////////////
 //getCurrentWeatherData("Chicago")
 getCurrentWeatherData("Chicago")
-//getUVIndex(41.85, -87.65)
 getUV_Index(41.85, -87.65) 
 //TEST AREA//////////////////////////////
-
-
-
 
 // // Listens to the search button.
 // // Clears the input box when a search is performed.
@@ -65,9 +61,10 @@ function getCurrentWeatherData(city) {
 
       }
     });
-  }
-var xyz = moment().format("   (dddd, MMMM Do YYYY)")
-console.log(xyz)
+}
+
+// var xyz = moment().format("   (dddd, MMMM Do YYYY)")
+// console.log(xyz)
 
 
 function getUV_Index(latitude, longitude) {
@@ -91,24 +88,67 @@ function getUV_Index(latitude, longitude) {
     });
 }
 
+// test url
+// http://api.openweathermap.org/data/2.5/forecast?id=4887398&appid=f64d6d31f15458727f791647df068f9b
+// dates in the array: 8, 16, 24, 32, 39
 function getFiveDayForecast(cityID) {
     $.ajax({
-        url: "http://api.openweathermap.org/data/2.5/forecast?id=" + cityID + "&appid=" + "f64d6d31f15458727f791647df068f9b",
+        url: "http://api.openweathermap.org/data/2.5/forecast?id=" + cityID + "&appid=" + "f64d6d31f15458727f791647df068f9b&units=imperial",
         type: "GET",
         datatype: "json",
         success: function(response) {
             return;
         }
+    }).then(response => {
+        console.log(response)
+        $("#forecast").empty()
+        $("#forecast").append($("<h3>").text("5 Day Forecast:"))
+        $("#forecast").append($("<div>").addClass("row"))
+
+        for (var i = 0; i < response.list.length; i++) {
+            if (response.list[i].dt_txt.indexOf("12:00:00") !== -1){ 
+                var columnForCard = $("<div>").addClass("col-md-2");
+                var card = $("<div>").addClass("card bg-primary text-white");
+                var body = $("<div>").addClass("card-body p-1");
+                
+            }
+            console.log("begin " + i)
+            console.log("hello: --> " + response.list[i].dt_txt) //learn how to use the Date object. youtube it. 
+            // console.log(response.weather[0].icon)  //I need to find a way to output this image file
+            console.log(response.list[i].main.temp)
+            console.log(response.list[i].main.humidity)
+            var tr = new Date(response.list[i].dt_txt).toLocaleDateString()
+            console.log(tr)
+            console.log("end " + i)
+
+            // var rt = new Date()
+            // console.log(rt)
+            // var tr = new Date(data.list[i].dt_txt).toLocaleDateString()
+            // console.log(tr)
+        }
     })
 }
-//http://api.openweathermap.org/data/2.5/forecast?id=4887398&appid=f64d6d31f15458727f791647df068f9b
+
+// new Date(data.list[i].dt_txt).toLocaleDateString()
+
+
+
 getFiveDayForecast(4887398)
 
-
-
 //////////////QUESTIONS FOR PHIL///////////////////
+// var arr = [0,1,2,3,4,5]
+// var newArr=arr.map(num=>{
+//    return num+1
+//})
 //1) I wanted to practice using cards and noticed that in the documentation on BootStrap, the 
 //cards are not responsive, but they are. So I'm a little confused about that. It's in the 
 //layout section of the card component section. 
 //2) In getCurrentWeatherData(city) I am trying to put the icon in a div. it will nto display. 
 //////////////QUESTIONS FOR PHIL///////////////////
+
+
+// parse date
+// figure out image
+// confirm console.logs are correct
+// build html
+// populate html

@@ -100,7 +100,7 @@ function getFiveDayForecast(cityID) {
                
                 
                 // Append data to tags.
-                body.append(forecastDate, $("<br>"),  $("<br>"), "Temp: " + forecastTemp + "°F", $("<br>"), "Humidity: " + forecastHumidity + "%")
+                body.append(forecastDate, $("<br>"),  $("<br>"), "Temp: " + forecastTemp + "°F", $("<br>"), $("<br>"), "Humidity: " + forecastHumidity + "%")
                 columnForCard.append(card.append(body))
                 $(".row-of-cards").append(columnForCard)
             }
@@ -115,21 +115,24 @@ $("#search-button").on("click", function(){
     $("#search-value").text("") // Don't know why this doesn't work.
     getCurrentWeatherData(place)
     makePreviouslySearchedButton(place)
+    localStorage.setItem("searchPlace", place) // not fully functional
 });
 
 
 // Take a string of the searched place and makes a button for it below the text bar. 
 function makePreviouslySearchedButton(previouslySearchedPlace) {
+    // if (previouslySearchedPlace) {
+
+    // }
+
     var searchedPlace = $("<li>").addClass("list-group-item list-group-item-action").text(previouslySearchedPlace)
     $(".history").append(searchedPlace)
 }
 
 // Listens to buttons of historical searches(the specified <li> tag).
-// WARNING: NOT YET FULLY FUNCTIONAL!!!
-// $(".history").on("click", "li", function() {
-//     var li = $("<li>").addClass("list-group-item list-group-item-action").text(text);
-//     $(".history").append(li);
-// });
+$(".history").on("click", "li", function() {
+    getCurrentWeatherData($(this).text());
+});
 // /////////END OF PROGRAM//////////////
 
 

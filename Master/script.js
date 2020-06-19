@@ -12,29 +12,6 @@
 
 
 /////////START OF THE PROGRAM//////////////
-// Listens to the search button.
-// Clears the input box when a search is performed.
-$("#search-button").on("click", function(){
-    var place = $("#search-value").val()
-    $("#search-value").text("") // Don't know why this doesn't work.
-    getCurrentWeatherData(place)
-    makePreviouslySearchedButton(place)
-});
-
-
-// Take a string of the searched place and makes a button for it below the text bar. 
-function makePreviouslySearchedButton(previouslySearchedPlace) {
-    var searchedPlace = $("<li>").addClass("list-group-item list-group-item-action").text(previouslySearchedPlace)
-    $(".history").append(searchedPlace)
-}
-
-// Listens to buttons of historical searches.
-// Calls getWeatherData to retrieve information.
-$(".history").on("click", "li", function() {
-    var li = $("<li>").addClass("list-group-item list-group-item-action").text(text);
-    $(".history").append(li);
-});
-
 
 // AJAX call to OpenWeather API for the current date's weather information.
 // Using dynamically generated Bootstrap cards.
@@ -130,7 +107,30 @@ function getFiveDayForecast(cityID) {
         }
     })
 }
-/////////END OF PROGRAM//////////////
+
+// Listens to the search button.
+// Clears the input box when a search is performed.
+$("#search-button").on("click", function(){
+    var place = $("#search-value").val()
+    $("#search-value").text("") // Don't know why this doesn't work.
+    getCurrentWeatherData(place)
+    makePreviouslySearchedButton(place)
+});
+
+
+// Take a string of the searched place and makes a button for it below the text bar. 
+function makePreviouslySearchedButton(previouslySearchedPlace) {
+    var searchedPlace = $("<li>").addClass("list-group-item list-group-item-action").text(previouslySearchedPlace)
+    $(".history").append(searchedPlace)
+}
+
+// Listens to buttons of historical searches(the specified <li> tag).
+// WARNING: NOT YET FULLY FUNCTIONAL!!!
+// $(".history").on("click", "li", function() {
+//     var li = $("<li>").addClass("list-group-item list-group-item-action").text(text);
+//     $(".history").append(li);
+// });
+// /////////END OF PROGRAM//////////////
 
 
 

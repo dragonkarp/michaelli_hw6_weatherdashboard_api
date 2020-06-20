@@ -121,9 +121,6 @@ $("#search-button").on("click", function(){
 
 // Take a string of the searched place and makes a button for it below the text bar. 
 function makePreviouslySearchedButton(previouslySearchedPlace) {
-    // if (previouslySearchedPlace) {
-
-    // }
 
     var searchedPlace = $("<li>").addClass("list-group-item list-group-item-action").text(previouslySearchedPlace)
     $(".history").append(searchedPlace)

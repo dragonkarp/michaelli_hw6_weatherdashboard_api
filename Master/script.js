@@ -51,7 +51,7 @@ function getCurrentWeatherData(city) {
 function getUV_Index(latitude, longitude) {
     $.ajax({
         type: "GET",
-        url: "http://api.openweathermap.org/data/2.5/uvi?appid=f64d6d31f15458727f791647df068f9b&lat=" + latitude + "&lon=" + longitude, 
+        url: "https://api.openweathermap.org/data/2.5/uvi?appid=f64d6d31f15458727f791647df068f9b&lat=" + latitude + "&lon=" + longitude, 
         dataType: "json",
         success: function(response) {
             var uvIndex = $("<span>").text(response.value)
@@ -72,7 +72,7 @@ function getUV_Index(latitude, longitude) {
 
 function getFiveDayForecast(cityID) {
     $.ajax({
-        url: "http://api.openweathermap.org/data/2.5/forecast?id=" + cityID + "&appid=" + "f64d6d31f15458727f791647df068f9b&units=imperial",
+        url: "https://api.openweathermap.org/data/2.5/forecast?id=" + cityID + "&appid=" + "f64d6d31f15458727f791647df068f9b&units=imperial",
         type: "GET",
         datatype: "json",
         success: function(response) {
@@ -93,7 +93,7 @@ function getFiveDayForecast(cityID) {
 
                 // Store the API data.
                     // I could not figure out how to 
-                    var iconurl = $("<img>").attr("src", "http://openweathermap.org/img/w/" + response.list[i].weather[0].icon + ".png")
+                    var iconurl = $("<img>").attr("src", "https://openweathermap.org/img/w/" + response.list[i].weather[0].icon + ".png")
                     // console.log(forecastIcon)
                 var forecastDate = new Date(response.list[i].dt_txt).toLocaleDateString()
                 var forecastTemp = response.list[i].main.temp

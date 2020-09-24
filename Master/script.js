@@ -25,7 +25,7 @@ function getCurrentWeatherData(city) {
 
         var currentWeatherMainCard = $("<div>").addClass("card") 
         var currentWeatherBodyDiv = $("<div>").addClass("card-body")
-        var iconurl = "http://openweathermap.org/img/w/" + response.weather[0].icon + ".png"
+        var iconurl = "https://openweathermap.org/img/w/" + response.weather[0].icon + ".png"
 
         var currentWeatherIcon = $("<img>").attr("src", iconurl)
 

@@ -18,21 +18,23 @@
 function getCurrentWeatherData(city) {
     $.ajax({
       type: "GET",
-      url: "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=f64d6d31f15458727f791647df068f9b&units=imperial",
+      url: "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=f64d6d31f15458727f791647df068f9b&units=imperial",
       dataType: "json",
       success: function(response) {
         $("#today").empty();
 
         var currentWeatherMainCard = $("<div>").addClass("card") 
         var currentWeatherBodyDiv = $("<div>").addClass("card-body")
-        var currentWeatherIcon = $("<div>").append(response.weather.icon)
+        var iconurl = "http://openweathermap.org/img/w/" + response.weather[0].icon + ".png"
+
+        var currentWeatherIcon = $("<img>").attr("src", iconurl)
 
         var currentWeatherTemp = $("<p>").addClass("card-text").text("Temperature: " + response.main.temp + "°F")
         var currentWeatherHumidity = $("<p>").addClass("card-text").text("Humidity: " + response.main.humidity + "%")
         var currentWeatherWindSpeed = $("<p>").addClass("card-text").text("Wind Speed:  " + response.wind.speed + " MPH")
 
         //currentWeatherTopInfo.append(currentWeatherCityName + currentDate + currentWeatherIcon) -_-' bad code
-        var currentWeatherTopInfo = $("<h4>").addClass("card-title").text(response.name + " " + moment().format("   (dddd, MMMM Do)  ") + currentWeatherIcon)
+        var currentWeatherTopInfo = $("<h4>").addClass("card-title").append(response.name + " " + moment().format("   (dddd, MMMM Do)  "), currentWeatherIcon)
 
         currentWeatherBodyDiv.append(currentWeatherTopInfo)
         currentWeatherBodyDiv.append(currentWeatherTemp, currentWeatherHumidity, currentWeatherWindSpeed)
@@ -51,10 +53,9 @@ function getUV_Index(latitude, longitude) {
         type: "GET",
         url: "http://api.openweathermap.org/data/2.5/uvi?appid=f64d6d31f15458727f791647df068f9b&lat=" + latitude + "&lon=" + longitude, 
         dataType: "json",
-        success: function(response){
+        success: function(response) {
             var uvIndex = $("<span>").text(response.value)
             var uvTextAndContainer = $("<p>").text("UV Index: ").append(uvIndex)
-
 
             if (response.value < 3) {
                 uvIndex.addClass("badge badge-success")
@@ -92,7 +93,7 @@ function getFiveDayForecast(cityID) {
 
                 // Store the API data.
                     // I could not figure out how to 
-                    // var forecastIcon = response.weather[0].icon
+                    var iconurl = $("<img>").attr("src", "http://openweathermap.org/img/w/" + response.list[i].weather[0].icon + ".png")
                     // console.log(forecastIcon)
                 var forecastDate = new Date(response.list[i].dt_txt).toLocaleDateString()
                 var forecastTemp = response.list[i].main.temp
@@ -100,7 +101,7 @@ function getFiveDayForecast(cityID) {
                
                 
                 // Append data to tags.
-                body.append(forecastDate, $("<br>"),  $("<br>"), "Temp: " + forecastTemp + "°F", $("<br>"), $("<br>"), "Humidity: " + forecastHumidity + "%")
+                body.append(forecastDate, $("<br>"), iconurl, $("<br>"),  $("<br>"), "Temp: " + forecastTemp + "°F", $("<br>"), $("<br>"), "Humidity: " + forecastHumidity + "%")
                 columnForCard.append(card.append(body))
                 $(".row-of-cards").append(columnForCard)
             }
@@ -108,28 +109,55 @@ function getFiveDayForecast(cityID) {
     })
 }
 
+var searchedCities = []
 // Listens to the search button.
 // Clears the input box when a search is performed.
-$("#search-button").on("click", function(){
+function searchCityWeather() {
     var place = $("#search-value").val()
     $("#search-value").text("") // Don't know why this doesn't work.
     getCurrentWeatherData(place)
     makePreviouslySearchedButton(place)
-    localStorage.setItem("searchPlace", place) // not fully functional
+    searchedCities.push(place)
+    localStorage.setItem("searchPlace", JSON.stringify(searchedCities)) 
+}
+
+$("#search-button").on("click", function() {
+    searchCityWeather()
 });
 
 
 // Take a string of the searched place and makes a button for it below the text bar. 
 function makePreviouslySearchedButton(previouslySearchedPlace) {
-
     var searchedPlace = $("<li>").addClass("list-group-item list-group-item-action").text(previouslySearchedPlace)
     $(".history").append(searchedPlace)
+}
+
+//enter key
+window.onkeypress = function (event) {
+    if (event.keyCode === 13) {
+        searchCityWeather()
+    }
+}
+
+// Populates list of searched cities on refresh.
+function citySearchHistory() {
+    if (localStorage.getItem("searchPlace")) {
+        searchedCities = JSON.parse(localStorage.getItem("searchPlace"))
+        console.log(searchedCities)
+        searchedCities.forEach(function(city) {
+            makePreviouslySearchedButton(city)
+        })
+    }
 }
 
 // Listens to buttons of historical searches(the specified <li> tag).
 $(".history").on("click", "li", function() {
     getCurrentWeatherData($(this).text());
 });
+
+citySearchHistory()
+
+
 // /////////END OF PROGRAM//////////////
 
 
